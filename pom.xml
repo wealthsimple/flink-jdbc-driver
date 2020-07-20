@@ -180,7 +180,7 @@ under the License.
                                     <include>org.apache.flink:flink-core</include>
                                     <include>org.apache.flink:flink-runtime_${scala.binary.version}</include>
                                     <include>org.apache.flink:flink-table-common</include>
-                                    <include>com.ververica:flink-sql-gateway</include>
+                                    <include>com.ververica:flink-sql-gateway_${flink.version}</include>
                                 </includes>
                             </artifactSet>
                             <filters>
@@ -200,7 +200,7 @@ under the License.
                                     </includes>
                                 </filter>
                                 <filter>
-                                    <artifact>com.ververica:flink-sql-gateway</artifact>
+                                    <artifact>com.ververica:flink-sql-gateway_${flink.version}</artifact>
                                     <includes>
                                         <include>com/ververica/flink/table/gateway/rest/**</include>
                                     </includes>
