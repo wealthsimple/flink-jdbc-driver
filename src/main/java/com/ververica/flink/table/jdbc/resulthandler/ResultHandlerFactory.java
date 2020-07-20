@@ -28,10 +28,10 @@ public class ResultHandlerFactory {
 	}
 
 	public static ResultHandler getResultHandlerByStatementType(String statementType) {
-		if ("DESCRIBE".equals(statementType)) {
-			return new DescribeResultHandler();
-		} else {
+//		if ("DESCRIBE".equals(statementType)) {
+//			return new DescribeResultHandler();
+//		} else {
 			return getDefaultResultHandler();
-		}
+//		}
 	}
 }

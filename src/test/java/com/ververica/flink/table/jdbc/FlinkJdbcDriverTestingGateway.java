@@ -19,10 +19,10 @@
 
 package com.ververica.flink.table.jdbc;
 
-import com.ververica.flink.table.gateway.SessionManager;
 import com.ververica.flink.table.gateway.config.Environment;
 import com.ververica.flink.table.gateway.context.DefaultContext;
 import com.ververica.flink.table.gateway.rest.SqlGatewayEndpoint;
+import com.ververica.flink.table.gateway.rest.session.SessionManager;
 
 import org.apache.flink.client.cli.DefaultCLI;
 import org.apache.flink.client.deployment.DefaultClusterClientServiceLoader;

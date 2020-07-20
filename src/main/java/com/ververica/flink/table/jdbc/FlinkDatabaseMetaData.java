@@ -22,7 +22,6 @@ import com.ververica.flink.table.gateway.rest.message.GetInfoResponseBody;
 import com.ververica.flink.table.gateway.rest.message.StatementExecuteResponseBody;
 import com.ververica.flink.table.gateway.rest.result.ColumnInfo;
 import com.ververica.flink.table.gateway.rest.result.ResultKind;
-import com.ververica.flink.table.gateway.rest.result.TableSchemaUtil;
 import com.ververica.flink.table.jdbc.rest.RestUtils;
 import com.ververica.flink.table.jdbc.rest.SessionClient;
 import com.ververica.flink.table.jdbc.resulthandler.ResultHandlerFactory;
@@ -30,17 +29,14 @@ import com.ververica.flink.table.jdbc.type.FlinkSqlType;
 import com.ververica.flink.table.jdbc.type.FlinkSqlTypes;
 
 import org.apache.flink.api.common.JobID;
-import org.apache.flink.table.api.TableColumn;
-import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.types.logical.IntType;
 import org.apache.flink.table.types.logical.LogicalType;
 import org.apache.flink.table.types.logical.SmallIntType;
 import org.apache.flink.table.types.logical.VarCharType;
+import org.apache.flink.table.types.logical.utils.LogicalTypeParser;
 import org.apache.flink.types.Either;
 import org.apache.flink.types.Row;
 import org.apache.flink.util.Preconditions;
-
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -902,30 +898,22 @@ public class FlinkDatabaseMetaData implements DatabaseMetaData {
 		List<Row> matches = new ArrayList<>();
 		GetPrimaryKeyResultColumnInfos columnInfos = new GetPrimaryKeyResultColumnInfos();
 
-		TableSchema tableSchema = getTableSchema(catalog, schema, table);
-		if (tableSchema.getPrimaryKey().isPresent()) {
-			List<String> keyNames = tableSchema.getPrimaryKey().get().getColumns();
-			for (TableColumn column : tableSchema.getTableColumns()) {
-				int pkIdx = keyNames.indexOf(column.getName());
-				if (pkIdx >= 0) {
-					matches.add(columnInfos.process(catalog, schema, table, column.getName(), pkIdx));
-				}
+		ResultSet columnsResult = getColumns(catalog, schema, table, null);
+		int idx = 0;
+		while (columnsResult.next()){
+			int keyIndex = ++idx;
+			String columnName = columnsResult.getString(1);
+			String key = columnsResult.getString(4);
+			if (key != null) {
+				matches.add(columnInfos.process(catalog, schema, table, columnName, keyIndex));
 			}
-			ret = FlinkResultSet.of(
-					com.ververica.flink.table.gateway.rest.result.ResultSet.builder()
-							.resultKind(ResultKind.SUCCESS_WITH_CONTENT)
-							.columns(columnInfos.getColumnInfos())
-							.data(matches)
-							.build());
-		} else {
-			// no primary keys
-			ret = FlinkResultSet.of(
-					com.ververica.flink.table.gateway.rest.result.ResultSet.builder()
-							.resultKind(ResultKind.SUCCESS_WITH_CONTENT)
-							.columns(columnInfos.getColumnInfos())
-							.data(Collections.emptyList())
-							.build());
 		}
+		ret = FlinkResultSet.of(
+				com.ververica.flink.table.gateway.rest.result.ResultSet.builder()
+						.resultKind(ResultKind.SUCCESS_WITH_CONTENT)
+						.columns(columnInfos.getColumnInfos())
+						.data(matches)
+						.build());
 
 		connection.setCatalog(oldCatalog);
 		connection.setSchema(oldDatabase);
@@ -1263,40 +1251,17 @@ public class FlinkDatabaseMetaData implements DatabaseMetaData {
 		}
 	}
 
-	private TableSchema getTableSchema(String catalog, String database, String table) throws SQLException {
-		connection.setCatalog(catalog);
-		connection.setSchema(database);
-		StatementExecuteResponseBody response = getImmediateSingleResponse("DESCRIBE " + table);
-		// we use raw results here to get table schema
-		ResultSet result = new FlinkResultSet(
-			session,
-			RestUtils.getEitherJobIdOrResultSet(response.getResults().get(0)),
-			ResultHandlerFactory.getDefaultResultHandler(),
-			0,
-			null);
-
-		boolean hasNext = result.next();
-		Preconditions.checkState(
-			hasNext,
-			"DESCRIBE statement must return exactly " +
-				"one serialized table schema json string. This is a bug.");
-		try {
-			return TableSchemaUtil.readTableSchemaFromJson(result.getString(1));
-		} catch (JsonProcessingException e) {
-			throw new SQLException("Failed to parse json to table schema", e);
-		}
-	}
-
 	private void appendColumnsInTable(
 			String catalog,
 			String database,
 			String table,
 			List<ColumnResultData> candidates) throws SQLException {
-		TableSchema tableSchema = getTableSchema(catalog, database, table);
+		connection.setCatalog(catalog);
+		connection.setSchema(database);
+		ResultSet result = getImmediateSingleSqlResultSet("DESCRIBE " + table);
 		int idx = 0;
-		for (TableColumn column : tableSchema.getTableColumns()) {
-			candidates.add(new ColumnResultData(
-				catalog, database, table, column.getName(), ++idx, column.getType().getLogicalType()));
+		while (result.next()) {
+			candidates.add(new ColumnResultData(catalog, database, table, result.getString(1), ++idx, LogicalTypeParser.parse(result.getString(2))));
 		}
 	}
 
