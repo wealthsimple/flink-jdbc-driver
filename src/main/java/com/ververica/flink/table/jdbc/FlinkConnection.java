@@ -53,7 +53,7 @@ import java.util.concurrent.Executor;
  */
 public class FlinkConnection implements Connection {
 
-	private final SessionClient session;
+	public final SessionClient session;
 	private boolean closed;
 
 	public FlinkConnection(String url) throws Exception {
