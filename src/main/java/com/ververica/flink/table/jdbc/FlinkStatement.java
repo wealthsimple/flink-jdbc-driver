@@ -493,7 +493,11 @@ public class FlinkStatement implements Statement {
 		private ReadWriteLock lock;
 
 		AtomicResultSetStatements(String stmt) {
-			this.statements = stmt.split(";");
+			stmt = stmt.trim();
+			if (stmt.endsWith(";")) {
+				stmt = stmt.substring(0, stmt.length() - 1);
+			}
+			this.statements = stmt.split(";(?=\\s*\n)");
 			this.lastExecutedIdx = -1;
 
 			this.lock = new ReentrantReadWriteLock();

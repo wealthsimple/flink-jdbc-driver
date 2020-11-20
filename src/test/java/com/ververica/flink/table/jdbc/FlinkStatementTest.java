@@ -134,16 +134,15 @@ public class FlinkStatementTest {
 		File tmpFile2 = File.createTempFile("flink-jdbc-driver-test", ".csv");
 		tmpFile1.deleteOnExit();
 		tmpFile2.deleteOnExit();
-
 		boolean executeIsQuery = statement.execute("CREATE TABLE testTable1(" +
 			"	fa INT," +
 			"	fb VARCHAR(100)" +
 			") WITH (" +
 			"	'connector.type'='filesystem'," +
 			"	'connector.path'='file://" + tmpFile1.getPath() + "'," +
-			"	'format.type' = 'csv');" +
-			"INSERT INTO testTable1 VALUES (1, 'stra'), (2, 'strb');" +
-			"SELECT * FROM testTable1 ORDER BY fa;" +
+			"	'format.type' = 'csv');" + "\n" +
+			"INSERT INTO testTable1 VALUES (1, 'stra'), (2, 'strb');" + "\n" +
+			"SELECT * FROM testTable1 ORDER BY fa;" + "\n" +
 
 			"CREATE TABLE testTable2(" +
 			"	fc INT," +
@@ -151,11 +150,11 @@ public class FlinkStatementTest {
 			") WITH (" +
 			"	'connector.type'='filesystem'," +
 			"	'connector.path'='file://" + tmpFile2.getPath() + "'," +
-			"	'format.type' = 'csv');" +
-			"INSERT INTO testTable2(fc, fd) SELECT * FROM testTable1;" +
-			"SELECT * FROM testTable2 ORDER BY fc;" +
+			"	'format.type' = 'csv');" + "\n" +
+			"INSERT INTO testTable2(fc, fd) SELECT * FROM testTable1;" + "\n" +
+			"SELECT * FROM testTable2 ORDER BY fc;" + "\n" +
 
-			"DROP TABLE testTable1;" +
+			"DROP TABLE testTable1;" + "\n" +
 			"DROP TABLE testTable2;");
 
 		Assert.assertFalse(executeIsQuery);
