@@ -80,7 +80,7 @@ public class FlinkJdbcDriverTestingGateway {
 			env,
 			Collections.emptyList(),
 			clusterClient.getFlinkConfiguration(),
-			new DefaultCLI(clusterClient.getFlinkConfiguration()),
+			new DefaultCLI(),
 			new DefaultClusterClientServiceLoader());
 		SessionManager sessionManager = new SessionManager(defaultContext);
 

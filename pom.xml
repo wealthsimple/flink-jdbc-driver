@@ -29,8 +29,8 @@ under the License.
     <packaging>jar</packaging>
 
     <properties>
-        <flink.version>1.11.1</flink.version>
-        <flink.sql.gateway.version>0.1-SNAPSHOT</flink.sql.gateway.version>
+        <flink.version>1.12.2</flink.version>
+        <flink.sql.gateway.version>0.3-SNAPSHOT</flink.sql.gateway.version>
         <java.version>1.8</java.version>
         <slf4j.version>1.7.15</slf4j.version>
         <scala.binary.version>2.11</scala.binary.version>
