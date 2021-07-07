@@ -2,7 +2,7 @@ test:
   tags:
   - maven
   script:
-  - mvn verify
+  - mvn clean verify
 
 deploy:
   stage: deploy
@@ -11,4 +11,4 @@ deploy:
   only:
   - qihoo-1.13@big-data/flink-jdbc-driver
   script:
-  - mvn deploy
+  - mvn clean deploy
