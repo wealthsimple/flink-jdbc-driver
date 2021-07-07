@@ -291,11 +291,11 @@ public class FlinkResultSetTest {
 	@Test
 	public void testGetBytes() throws SQLException {
 		try (ResultSet rs = statement.executeQuery("SELECT " +
-				"CAST('str1' AS BINARY(4)) x, " +
-				"CAST('str2' AS VARBINARY(4)), " +
+				"CAST('str1' AS BYTES) x, " +
+				"CAST('str2' AS BYTES), " +
 				"CAST('str3' AS CHAR(4)), " +
 				"CAST('str4' AS VARCHAR(4)), " +
-				"CAST(NULL AS BINARY(4))")) {
+				"CAST(NULL AS BYTES)")) {
 			Assert.assertTrue(rs.next());
 			Assert.assertArrayEquals("str1".getBytes(), rs.getBytes(1));
 			Assert.assertFalse(rs.wasNull());
@@ -380,7 +380,7 @@ public class FlinkResultSetTest {
 	@Test
 	public void testGetTimestamp() throws SQLException {
 		try (ResultSet rs = statement.executeQuery("SELECT " +
-				"CAST('2020-02-12 15:20:00' AS TIMESTAMP) x, '2020-02-13 16:20:00', CAST(NULL AS TIMESTAMP)")) {
+				"CAST('2020-02-12 15:20:00' AS TIMESTAMP(3)) x, '2020-02-13 16:20:00', CAST(NULL AS TIMESTAMP)")) {
 			Assert.assertTrue(rs.next());
 			Assert.assertEquals(Timestamp.valueOf("2020-02-12 15:20:00"), rs.getTimestamp(1));
 			Assert.assertFalse(rs.wasNull());

@@ -109,7 +109,7 @@ public class FlinkConnection implements Connection {
 			resultSet.getData().size() == 1,
 			"SHOW CURRENT CATALOG should return exactly one row of result. This is a bug.");
 
-		return resultSet.getData().get(0).toString();
+		return resultSet.getData().get(0).getField(0).toString();
 	}
 
 	@Override
@@ -141,7 +141,7 @@ public class FlinkConnection implements Connection {
 			resultSet.getData().size() == 1,
 			"SHOW CURRENT DATABASE should return exactly one row of result. This is a bug.");
 
-		return resultSet.getData().get(0).toString();
+		return resultSet.getData().get(0).getField(0).toString();
 	}
 
 	@Override

@@ -9,6 +9,6 @@ deploy:
   tags:
   - maven
   only:
-  - qihoo-1.12@big-data/flink-jdbc-driver
+  - qihoo-1.13@big-data/flink-jdbc-driver
   script:
   - mvn deploy

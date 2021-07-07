@@ -24,13 +24,13 @@ under the License.
     <artifactId>flink-jdbc-driver_${flink.version}</artifactId>
     <groupId>com.ververica</groupId>
     <name>flink-jdbc-driver</name>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.4-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
     <properties>
-        <flink.version>1.12.2</flink.version>
-        <flink.sql.gateway.version>0.3-SNAPSHOT</flink.sql.gateway.version>
+        <flink.version>1.13.1</flink.version>
+        <flink.sql.gateway.version>0.4-SNAPSHOT</flink.sql.gateway.version>
         <java.version>1.8</java.version>
         <slf4j.version>1.7.15</slf4j.version>
         <scala.binary.version>2.11</scala.binary.version>
