@@ -274,6 +274,29 @@ public class FlinkStatementTest {
 		}
 	}
 
+	@Test
+	public void testDescribeTables() throws SQLException {
+		ResultSet rs = statement.executeQuery("DESCRIBE myTable");
+		Assert.assertTrue(rs.next());
+		Assert.assertEquals("a", rs.getString(1));
+		Assert.assertEquals("INT", rs.getString(2));
+		Assert.assertEquals("true", rs.getString(3));
+		Assert.assertTrue(rs.next());
+		Assert.assertEquals("b", rs.getString(1));
+		Assert.assertEquals("VARCHAR(100)", rs.getString(2));
+		Assert.assertEquals("true", rs.getString(3));
+	}
+
+	@Test
+	public void testExplainForTables() throws SQLException {
+		ResultSet rs = statement.executeQuery("EXPLAIN PLAN FOR select * from myTable");
+		Assert.assertTrue(rs.next());
+		String explainResult = rs.getString(1);
+		Assert.assertTrue(explainResult.contains("Syntax Tree"));
+		Assert.assertTrue(explainResult.contains("Physical Plan"));
+		Assert.assertTrue(explainResult.contains("Execution Plan"));
+	}
+
 	private void compareStringResultsWithSorting(String[] expected, ResultSet actualResultSet) throws SQLException {
 		Arrays.sort(expected);
 

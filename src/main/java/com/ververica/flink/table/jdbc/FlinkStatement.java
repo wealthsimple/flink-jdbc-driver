@@ -55,7 +55,7 @@ public class FlinkStatement implements Statement {
 		"SHOW_TABLES",
 		"SHOW_VIEWS",
 		"SHOW_FUNCTIONS",
-		"DESCRIBE",
+		"DESCRIBE_TABLE",
 		"EXPLAIN");
 
 	private final SessionClient session;
