@@ -63,7 +63,7 @@ public class FlinkResultSetTest {
 
 		InetSocketAddress addr = gateway.getServerAddress();
 		Assert.assertNotNull(addr);
-		connection = new FlinkConnection("jdbc:flink://localhost:" + addr.getPort() + "?planner=blink");
+		connection = new FlinkConnection("jdbc:flink://localhost:" + addr.getPort());
 		Assert.assertTrue(connection.isValid(0));
 	}
 

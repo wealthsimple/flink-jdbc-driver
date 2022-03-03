@@ -95,19 +95,19 @@ public class FlinkConnection implements Connection {
 		StatementExecuteResponseBody response;
 		response = session.submitStatement("SHOW CURRENT CATALOG");
 		Preconditions.checkArgument(
-			response.getResults().size() == 1,
-			"SHOW CURRENT CATALOG should return exactly one result set. This is a bug.");
+				response.getResults().size() == 1,
+				"SHOW CURRENT CATALOG should return exactly one result set. This is a bug.");
 
 		Either<JobID, ResultSet> jobIdOrResultSet =
-			RestUtils.getEitherJobIdOrResultSet(response.getResults().get(0));
+				RestUtils.getEitherJobIdOrResultSet(response.getResults().get(0));
 		Preconditions.checkArgument(
-			jobIdOrResultSet.isRight(),
-			"SHOW CURRENT CATALOG should immediately return a result. This is a bug.");
+				jobIdOrResultSet.isRight(),
+				"SHOW CURRENT CATALOG should immediately return a result. This is a bug.");
 
 		ResultSet resultSet = jobIdOrResultSet.right();
 		Preconditions.checkArgument(
-			resultSet.getData().size() == 1,
-			"SHOW CURRENT CATALOG should return exactly one row of result. This is a bug.");
+				resultSet.getData().size() == 1,
+				"SHOW CURRENT CATALOG should return exactly one row of result. This is a bug.");
 
 		return resultSet.getData().get(0).getField(0).toString();
 	}
@@ -127,19 +127,19 @@ public class FlinkConnection implements Connection {
 		StatementExecuteResponseBody response;
 		response = session.submitStatement("SHOW CURRENT DATABASE");
 		Preconditions.checkArgument(
-			response.getResults().size() == 1,
-			"SHOW CURRENT DATABASE should return exactly one result set. This is a bug.");
+				response.getResults().size() == 1,
+				"SHOW CURRENT DATABASE should return exactly one result set. This is a bug.");
 
 		Either<JobID, ResultSet> jobIdOrResultSet =
-			RestUtils.getEitherJobIdOrResultSet(response.getResults().get(0));
+				RestUtils.getEitherJobIdOrResultSet(response.getResults().get(0));
 		Preconditions.checkArgument(
-			jobIdOrResultSet.isRight(),
-			"SHOW CURRENT DATABASE should immediately return a result. This is a bug.");
+				jobIdOrResultSet.isRight(),
+				"SHOW CURRENT DATABASE should immediately return a result. This is a bug.");
 
 		ResultSet resultSet = jobIdOrResultSet.right();
 		Preconditions.checkArgument(
-			resultSet.getData().size() == 1,
-			"SHOW CURRENT DATABASE should return exactly one row of result. This is a bug.");
+				resultSet.getData().size() == 1,
+				"SHOW CURRENT DATABASE should return exactly one row of result. This is a bug.");
 
 		return resultSet.getData().get(0).getField(0).toString();
 	}
@@ -402,52 +402,40 @@ public class FlinkConnection implements Connection {
 
 		String host;
 		int port;
-		String planner = null;
 		Map<String, String> properties = new HashMap<>();
 
 		int argumentStart = url.indexOf('?');
-		if (argumentStart < 0) {
-			throw new IllegalArgumentException(neededParams);
+		int colonPos = url.indexOf(':');
+		if (colonPos < 0) {
+			throw new IllegalArgumentException("Cannot read port from string " + url);
 		} else {
-			int colonPos = url.indexOf(':');
-			if (colonPos < 0) {
-				throw new IllegalArgumentException("Cannot read port from string " + url);
-			} else {
-				host = url.substring(0, colonPos);
-				try {
-					port = Integer.valueOf(url.substring(colonPos + 1, argumentStart));
-				} catch (NumberFormatException e) {
-					throw new IllegalArgumentException("Invalid port format");
-				}
+			host = url.substring(0, colonPos);
+			try {
+				port = Integer.parseInt(url.substring(colonPos + 1, argumentStart > 0 ? argumentStart : url.length()));
+			} catch (NumberFormatException e) {
+				throw new IllegalArgumentException("Invalid port format");
 			}
 		}
 
-		for (String kv : url.substring(argumentStart + 1).split("&")) {
-			int equalPos = kv.indexOf('=');
-			if (equalPos < 0) {
-				throw new IllegalArgumentException("Invalid url parameter kv pair " + kv);
-			}
+		if (argumentStart >= 0) {
+			for (String kv : url.substring(argumentStart + 1).split("&")) {
+				int equalPos = kv.indexOf('=');
+				if (equalPos < 0) {
+					throw new IllegalArgumentException("Invalid url parameter kv pair " + kv);
+				}
 
-			String key = kv.substring(0, equalPos);
-			String value = kv.substring(equalPos + 1);
-
-			if (key.equals("planner")) {
-				planner = value;
-			} else {
+				String key = kv.substring(0, equalPos);
+				String value = kv.substring(equalPos + 1);
 				properties.put(key, value);
 			}
 		}
 
-		if (planner == null) {
-			throw new IllegalArgumentException(neededParams);
-		}
-
-		return new UrlInfo(host, port, planner, properties);
+		return new UrlInfo(host, port, properties);
 	}
 
 	private SessionClient createSession(String url) throws Exception {
 		UrlInfo urlInfo = parseUrl(url);
-		return new SessionClient(urlInfo.host, urlInfo.port, "Flink-JDBC", urlInfo.planner, "batch", urlInfo.properties, "Flink-JDBC-Connection-IO");
+		return new SessionClient(urlInfo.host, urlInfo.port, "Flink-JDBC", "batch", urlInfo.properties, "Flink-JDBC-Connection-IO");
 	}
 
 	/**
@@ -456,13 +444,11 @@ public class FlinkConnection implements Connection {
 	private static class UrlInfo {
 		final String host;
 		final int port;
-		final String planner;
 		final Map<String, String> properties;
 
-		UrlInfo(String host, int port, String planner, Map<String, String> properties) {
+		UrlInfo(String host, int port, Map<String, String> properties) {
 			this.host = host;
 			this.port = port;
-			this.planner = planner;
 			this.properties = properties;
 		}
 	}

@@ -32,7 +32,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Tests for {@link FlinkStatement}.
@@ -53,7 +56,7 @@ public class FlinkStatementTest {
 
 		InetSocketAddress addr = gateway.getServerAddress();
 		Assert.assertNotNull(addr);
-		connection = new FlinkConnection("jdbc:flink://localhost:" + addr.getPort() + "?planner=blink");
+		connection = new FlinkConnection("jdbc:flink://localhost:" + addr.getPort());
 		Assert.assertTrue(connection.isValid(0));
 	}
 

@@ -59,7 +59,6 @@ public class SessionClient {
 	private final String serverHost;
 	private final int serverPort;
 	private final String sessionName;
-	private final String planner;
 	private final String executionType;
 	private final Map<String, String> properties;
 	private final RestClient restClient;
@@ -72,7 +71,6 @@ public class SessionClient {
 		String serverHost,
 		int serverPort,
 		String sessionName,
-		String planner,
 		String executionType,
 		Map<String, String> properties,
 		String threadName)
@@ -80,7 +78,6 @@ public class SessionClient {
 		this.serverHost = serverHost;
 		this.serverPort = serverPort;
 		this.sessionName = sessionName;
-		this.planner = planner;
 		this.executionType = executionType;
 		this.properties = properties;
 		this.executor = Executors.newFixedThreadPool(4, new ExecutorThreadFactory(threadName));
@@ -97,10 +94,6 @@ public class SessionClient {
 		return serverPort;
 	}
 
-	public String getPlanner() {
-		return planner;
-	}
-
 	public Map<String, String> getProperties() {
 		return properties;
 	}
@@ -111,7 +104,7 @@ public class SessionClient {
 			serverPort,
 			SessionCreateHeaders.getInstance(),
 			EmptyMessageParameters.getInstance(),
-			new SessionCreateRequestBody(sessionName, planner, executionType, properties))
+			new SessionCreateRequestBody(sessionName, "blink", executionType, properties))
 			.get().getSessionId();
 	}
 

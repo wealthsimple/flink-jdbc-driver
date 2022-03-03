@@ -86,7 +86,7 @@ public class FlinkDatabaseMetaData implements DatabaseMetaData {
 	@Override
 	public String getURL() throws SQLException {
 		String url =  FlinkDriver.URL_PREFIX + session.getServerHost() + ":" + session.getServerPort() +
-			"?planner=" + session.getPlanner();
+			"?planner=blink";
 		for (Map.Entry<String, String> entry: session.getProperties().entrySet()) {
 			url += "&" + entry.getKey() + "=" + entry.getValue();
 		}
@@ -240,7 +240,7 @@ public class FlinkDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public String getSearchStringEscape() throws SQLException {
-		throw new SQLFeatureNotSupportedException("FlinkDatabaseMetaData#getSearchStringEscape is not supported");
+		return "\\";
 	}
 
 	@Override
