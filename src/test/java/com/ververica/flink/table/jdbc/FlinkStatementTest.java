@@ -32,9 +32,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Tests for {@link FlinkStatement}.
@@ -96,18 +94,18 @@ public class FlinkStatementTest {
 		tmpFile.deleteOnExit();
 
 		int createTableUpdateCount = statement.executeUpdate(
-			"CREATE TABLE testTable(" +
-				"	fa INT," +
-				"	fb VARCHAR(100)" +
-				") WITH (" +
-				"	'connector.type'='filesystem'," +
-				"	'connector.path'='file://" + tmpFile.getPath() + "'," +
-				"	'format.type' = 'csv')");
+				"CREATE TABLE testTable(" +
+						"	fa INT," +
+						"	fb VARCHAR(100)" +
+						") WITH (" +
+						"	'connector.type'='filesystem'," +
+						"	'connector.path'='file://" + tmpFile.getPath() + "'," +
+						"	'format.type' = 'csv')");
 		// CREATE TABLE is a DDL, according to JDBC Java doc it's update count is 0
 		Assert.assertEquals(0, createTableUpdateCount);
 
 		int insertUpdateCount = statement.executeUpdate(
-			"INSERT INTO testTable VALUES (1, 'stra'), (2, 'strb')");
+				"INSERT INTO testTable VALUES (1, 'stra'), (2, 'strb')");
 		// TODO change this when gateway supports real update count
 		Assert.assertEquals(Statement.SUCCESS_NO_INFO, insertUpdateCount);
 
@@ -135,27 +133,27 @@ public class FlinkStatementTest {
 		tmpFile1.deleteOnExit();
 		tmpFile2.deleteOnExit();
 		boolean executeIsQuery = statement.execute("CREATE TABLE testTable1(" +
-			"	fa INT," +
-			"	fb VARCHAR(100)" +
-			") WITH (" +
-			"	'connector.type'='filesystem'," +
-			"	'connector.path'='file://" + tmpFile1.getPath() + "'," +
-			"	'format.type' = 'csv');" + "\n" +
-			"INSERT INTO testTable1 VALUES (1, 'stra'), (2, 'strb');" + "\n" +
-			"SELECT * FROM testTable1 ORDER BY fa;" + "\n" +
+				"	fa INT," +
+				"	fb VARCHAR(100)" +
+				") WITH (" +
+				"	'connector.type'='filesystem'," +
+				"	'connector.path'='file://" + tmpFile1.getPath() + "'," +
+				"	'format.type' = 'csv');" + "\n" +
+				"INSERT INTO testTable1 VALUES (1, 'stra'), (2, 'strb');" + "\n" +
+				"SELECT * FROM testTable1 ORDER BY fa;" + "\n" +
 
-			"CREATE TABLE testTable2(" +
-			"	fc INT," +
-			"	fd VARCHAR(100)" +
-			") WITH (" +
-			"	'connector.type'='filesystem'," +
-			"	'connector.path'='file://" + tmpFile2.getPath() + "'," +
-			"	'format.type' = 'csv');" + "\n" +
-			"INSERT INTO testTable2(fc, fd) SELECT * FROM testTable1;" + "\n" +
-			"SELECT * FROM testTable2 ORDER BY fc;" + "\n" +
+				"CREATE TABLE testTable2(" +
+				"	fc INT," +
+				"	fd VARCHAR(100)" +
+				") WITH (" +
+				"	'connector.type'='filesystem'," +
+				"	'connector.path'='file://" + tmpFile2.getPath() + "'," +
+				"	'format.type' = 'csv');" + "\n" +
+				"INSERT INTO testTable2(fc, fd) SELECT * FROM testTable1;" + "\n" +
+				"SELECT * FROM testTable2 ORDER BY fc;" + "\n" +
 
-			"DROP TABLE testTable1;" + "\n" +
-			"DROP TABLE testTable2;");
+				"DROP TABLE testTable1;" + "\n" +
+				"DROP TABLE testTable2;");
 
 		Assert.assertFalse(executeIsQuery);
 		// CREATE TABLE is a DDL, according to JDBC Java doc it's update count is 0
@@ -208,12 +206,12 @@ public class FlinkStatementTest {
 	@Test
 	public void testShows() throws Exception {
 		compareStringResultsWithSorting(
-			new String[]{"default_catalog", "cat1", "cat2"}, statement.executeQuery("SHOW CATALOGS"));
+				new String[]{"default_catalog", "cat1", "cat2"}, statement.executeQuery("SHOW CATALOGS"));
 
 		statement.execute("USE CATALOG cat1");
 		statement.execute("CREATE DATABASE db12");
 		compareStringResultsWithSorting(
-			new String[]{"db11", "db12"}, statement.executeQuery("SHOW DATABASES"));
+				new String[]{"db11", "db12"}, statement.executeQuery("SHOW DATABASES"));
 
 		statement.execute("USE db11");
 		compareStringResultsWithSorting(new String[]{"cat1"}, statement.executeQuery("SHOW CURRENT CATALOG"));
@@ -225,21 +223,21 @@ public class FlinkStatementTest {
 		tmpFile2.deleteOnExit();
 
 		statement.executeUpdate("CREATE TABLE testTable1(" +
-			"	fa INT," +
-			"	fb VARCHAR(100)" +
-			") WITH (" +
-			"	'connector.type'='filesystem'," +
-			"	'connector.path'='file://" + tmpFile1.getPath() + "'," +
-			"	'format.type' = 'csv');");
+				"	fa INT," +
+				"	fb VARCHAR(100)" +
+				") WITH (" +
+				"	'connector.type'='filesystem'," +
+				"	'connector.path'='file://" + tmpFile1.getPath() + "'," +
+				"	'format.type' = 'csv');");
 		statement.executeUpdate("CREATE TABLE testTable2(" +
-			"	fc INT," +
-			"	fd VARCHAR(100)" +
-			") WITH (" +
-			"	'connector.type'='filesystem'," +
-			"	'connector.path'='file://" + tmpFile2.getPath() + "'," +
-			"	'format.type' = 'csv');");
+				"	fc INT," +
+				"	fd VARCHAR(100)" +
+				") WITH (" +
+				"	'connector.type'='filesystem'," +
+				"	'connector.path'='file://" + tmpFile2.getPath() + "'," +
+				"	'format.type' = 'csv');");
 		compareStringResultsWithSorting(
-			new String[]{"testTable1", "testTable2"}, statement.executeQuery("SHOW TABLES"));
+				new String[]{"testTable1", "testTable2"}, statement.executeQuery("SHOW TABLES"));
 
 		statement.executeUpdate("DROP TABLE testTable1");
 		statement.executeUpdate("DROP TABLE testTable2");
@@ -295,6 +293,24 @@ public class FlinkStatementTest {
 		Assert.assertTrue(explainResult.contains("Syntax Tree"));
 		Assert.assertTrue(explainResult.contains("Physical Plan"));
 		Assert.assertTrue(explainResult.contains("Execution Plan"));
+	}
+
+	@Test
+	public void testSetCommand() throws SQLException {
+		ResultSet rs = statement.executeQuery("SET");
+		List<String> resultList = new ArrayList<>();
+		while (rs.next()) {
+			resultList.add(rs.getString(1) + "=" + rs.getString(2));
+		}
+		Collections.sort(resultList);
+		String expected = "[deployment.gateway-address=, " +
+				"deployment.gateway-port=0, " +
+				"deployment.response-timeout=5000, " +
+				"execution.current-catalog=default_catalog, " +
+				"execution.current-database=default_database, " +
+				"execution.planner=blink, " +
+				"execution.result-mode=table, execution.type=batch]";
+		Assert.assertEquals(expected, resultList.toString());
 	}
 
 	private void compareStringResultsWithSorting(String[] expected, ResultSet actualResultSet) throws SQLException {
